@@ -12,16 +12,16 @@ docker run --rm \
 -e DISPLAY=host.docker.internal:0 \
 -e PATH=/bin:/sbin:$QUARTUS_PATH \
 -e LD_LIBRARY_PATH=$QUARTUS_PATH \
--e LM_LICENSE_FILE=$LM_LICENSE_FILE \
--e MGLS_LICENSE_FILE=$MGLS_LICENSE_FILE \
+-e "LM_LICENSE_FILE=$LM_LICENSE_FILE" \
+-e "MGLS_LICENSE_FILE=$MGLS_LICENSE_FILE" \
 --mac-address=$LICENSE_MAC \
 -v /etc/passwd:/etc/passwd:ro \
 -v /etc/group:/etc/group:ro  \
--v $HOME/.Xauthority:/root/.Xauthority \
--v $HOME:$HOME \
--w $PWD \
+-v "$HOME/.Xauthority:/root/.Xauthority" \
+-v "$HOME:$HOME" \
+-w "$PWD" \
 --ipc=host \
 -v /dev/bus/usb:/dev/bus/usb \
 --device-cgroup-rule='c *:* rmw' \
 --security-opt seccomp=unconfined \
--ti $QUARTUS13_IMAGE $@
+-ti $QUARTUS13_IMAGE "$@"

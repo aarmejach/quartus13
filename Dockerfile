@@ -1,7 +1,7 @@
 ARG INSTALL_DIR="/opt/altera/13.0sp1"
 ARG QUARTUS_INSTALLER="QuartusSetupWeb-13.0.1.232.run"
 
-FROM ubuntu:20.04 as installer
+FROM docker.io/library/ubuntu:20.04 as installer
 LABEL stage=builder
 ARG QUARTUS_INSTALLER
 
@@ -16,7 +16,7 @@ RUN apt update && \
     /tmp/${QUARTUS_INSTALLER} --unattendedmodeui minimal --mode unattended --installdir /tmp/installer && \
     rm -rf /tmp/${QUARTUS_INSTALLER}
 
-FROM ubuntu:20.04
+FROM docker.io/library/ubuntu:20.04
 ARG INSTALL_DIR
 
 LABEL maintainer="Victor Muñoz <victor@2c-b.cl>"

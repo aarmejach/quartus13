@@ -64,6 +64,61 @@ Aneu a `Tools->Options->EDA Tool Options` i a la ruta de ModelSim poseu la versi
 /opt/altera/13.0sp1/modelsim_ase/linuxaloem
 ```
 
+# Usar Podman en lloc de Docker
+
+Si no teniu Docker (per exemple, a màquines on només hi ha Podman), podeu fer servir Podman en mode *rootless*.
+
+Instal·lar Podman:
+```bash
+sudo apt install podman
+```
+
+Comproveu que el vostre usuari té un rang de subuids/subgids assignat (necessari per construir la imatge):
+```bash
+grep $USER /etc/subuid /etc/subgid
+```
+
+## Construir la imatge
+
+*Atenció:* la construcció necessita uns 30 GB lliures al disc on Podman guarda les imatges (per defecte `~/.local/share/containers`). En el pic, la imatge base té dues còpies de la instal·lació de Quartus + ModelSim (~13 GB cadascuna). La imatge final ocupa uns 15 GB.
+
+Seguiu les mateixes passes de [Setup](#setup), però canviant `docker` per `podman`:
+```bash
+podman build -t quartus_base:13.0.1.2 -f Dockerfile_with_modelsim .
+podman build -t quartus:13.0.1.2 -f Dockerfile_devices --build-arg QUARTUS_BASE=quartus_base:13.0.1.2 .
+```
+
+Despres de generar la imatge final es poden borrar les imatges intermèdies:
+```bash
+podman image prune -f
+```
+
+## Copiar la imatge a una altra màquina
+
+Podeu construir la imatge en una màquina i fer-la servir en una altra on només hi ha Podman:
+```bash
+# A la màquina on s'ha construit
+podman save -o quartus-13.0.1.2.tar quartus:13.0.1.2
+# A la màquina destí
+podman load -i quartus-13.0.1.2.tar
+```
+
+## Executar Quartus
+
+Els mateixos scripts detecten automàticament si cal fer servir Docker o Podman:
+```bash
+$QUARTUS_PATH/shell/quartus
+```
+
+Si teniu els dos instal·lats i voleu forçar Podman:
+```bash
+CONTAINER_ENGINE=podman $QUARTUS_PATH/shell/quartus
+```
+
+Amb Podman rootless, dins del contenidor sou `root`, però aquest `root` correspon al vostre usuari a la màquina host: els fitxers que es creen al vostre `$HOME` són vostres.
+
+Per programar la placa (USB-Blaster) amb Podman, el vostre usuari ha de tenir permís d'escriptura al dispositiu USB a la màquina host (per exemple, amb una regla udev).
+
 # Instal·lar entorn per a macOS ARM M1+
 
 És possible executar Quartus i Modelsim a un màquina Mac amb el processador M1 o superior.

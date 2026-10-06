@@ -1,7 +1,7 @@
 ARG QUARTUS_BASE=quartus_base:13
 ARG INSTALL_DIR="/opt/altera/13.0sp1"
 
-FROM ubuntu:20.04 as installer
+FROM docker.io/library/ubuntu:20.04 as installer
 LABEL stage=builder
 ARG INSTALL_DIR
 
